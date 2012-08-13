@@ -21,7 +21,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 Client myClient; //instancia del cliente
-WebResource myWebResource; //recurso a consultar
+WebResource myWebResource; //recurso a consultar via GET
+WebResource postResource; //recurso para hacer POST
 
 JSONParser parser; //Objeto para analizar JSON
 
@@ -30,8 +31,9 @@ void setup() {
   
   //Inicializa la instancia del cliente
   myClient = Client.create();
-  //endpoint del API a consultar
+  //endpoints del API a interactuar
   myWebResource = myClient.resource("http://api.thingspeak.com/channels/9/feed.json");
+  postResource = myClient.resource("http://api.openkeyval.org/objetos_en_red-test");
   
   //instancia el parser de Json
   parser = new JSONParser();
@@ -114,6 +116,40 @@ void getResourceWithParams(){
   }
 }
 
+void postData(){
+  /*
+  Construye un objeto JSON con la informacion a guardar y lo envia
+  al endpoint del API especificado usando el metodo HTTP POST, si
+  la peticion se realizo correctamente la respuesta contiene el 
+  status 200 OK
+  */
+  
+  //crea un nuevo objeto JSONObject
+  JSONObject dataJson = new JSONObject();
+  //agrega dos campos con sus respectivos datos
+  //.put("campo", "valor")
+  dataJson.put("name", "objetos en red");
+  dataJson.put("millis", str(millis()));
+  
+  //crea un JSONArray
+  JSONArray arrayJson = new JSONArray();
+  //lo llena con numeros aleatorios
+  arrayJson.add(str(random(1000)));
+  arrayJson.add(str(random(1000)));
+  arrayJson.add(str(random(1000)));
+  //agrega el array al objeto JSONObject
+  dataJson.put("floats", arrayJson);
+  
+  //crea un objeto contendra los datos a enviar
+  MultivaluedMap formData = new MultivaluedMapImpl();
+  //crea el campo con el nombre "data" y guarda el string JSON creado antes
+  formData.add("data", dataJson.toJSONString());
+  //Hace el POST al URL del API
+  ClientResponse response = postResource.post(ClientResponse.class, formData);
+  //finalmente imprime la respuesta enviada por el servidor
+  println(response);
+}
+
 void mousePressed(){
   switch (mouseButton){
     case LEFT:
@@ -121,6 +157,9 @@ void mousePressed(){
       break;
     case RIGHT:
       getSimpleResource();
+      break;
+    case CENTER:
+      postData();
       break;
   }  
 }
