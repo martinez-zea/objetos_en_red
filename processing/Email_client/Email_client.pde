@@ -3,16 +3,9 @@
 import javax.mail.*;
 import javax.mail.internet.*;
 
-Message[] msgs = new Message[1];
-
 Message lastMessage;
 int lastMessageCount;
 boolean firstCheck = true;
-/*
-String email = "email@server.domain";
-String server = "mail.server.domain";
-String pass = "password";
-*/
 
 String email = "user@gmail.com";
 String smtp_host = "smtp.gmail.com";
@@ -22,7 +15,6 @@ String pass = "password";
 void setup() {
   size(200,200);
   lastMessageCount = 0;
- 
 }
 
 void draw(){
@@ -32,9 +24,10 @@ void draw(){
 
 void checkMail() {
   try {
-    Properties props = System.getProperties();
+    
+    Properties props = new Properties();
 
-  //puerto de email sin ssl en dreamhost
+    //
     props.put("mail.imap.port", "993");
     
     //seguridad
@@ -47,64 +40,55 @@ void checkMail() {
 
     //Auth auth = new Auth();
     
-    // Make a session
-    Session session = Session.getDefaultInstance(props, null);
-    //Store store = session.getStore("pop3");
-    Store store = session.getStore("imaps");
+    // Crea una sesion
+    Session receive_session = Session.getDefaultInstance(props, null);
+    Store store = receive_session.getStore("imaps");
     store.connect(imap_host, email, pass);
     
-    // Get inbox
+    // Obtiene el Inbox
     Folder folder = store.getFolder("INBOX");
     folder.open(Folder.READ_ONLY);
     System.out.println(folder.getMessageCount() + " total messages.");
-    
-    // Get array of messages and display them
-    //msgs = folder.getMessages();
- 
+
     if(lastMessageCount < folder.getMessageCount()){
       if(firstCheck){
         println("first check");
         lastMessageCount = folder.getMessageCount();
-        msgs[0] = folder.getMessages()[folder.getMessageCount() - 1];
+        lastMessage = folder.getMessages()[folder.getMessageCount() - 1];
         firstCheck = false;
         
       }else{
         println("normal check");
-
         int newMessageCount = abs(folder.getMessageCount() - lastMessageCount);
-        //int startMessage = folder.getMessageCount() - 1;
-        //int endMessage = folder.getMessageCount() - newMessageCount;
-        msgs[0] = folder.getMessages()[folder.getMessageCount() - 1];
+        lastMessage = folder.getMessages()[folder.getMessageCount() - 1];
         lastMessageCount = folder.getMessageCount();
       }
 
-      for(int i = 0; i < msgs.length; i ++){
-        System.out.println("---------------------");
-        //System.out.println("Message # " + (i+1));
-        System.out.println("From: " + msgs[i].getFrom()[0]);
-        System.out.println("Subject: " + msgs[i].getSubject());
-        System.out.println("Message:");
-        String content = msgs[i].getContent().toString(); 
-        System.out.println(content);
-         
-      
-    }
+        println("--------- BEGIN MESSAGE------------");
+        println("From: " + lastMessage.getFrom()[0]);
+        println("Subject: " + lastMessage.getSubject());
+        println("Message:");
+        String content = lastMessage.getContent().toString(); 
+        println(content);
+        println("--------- END MESSAGE------------");
+
+    }else{
+      println("Usted no teine mensajes nuevos");
     }
     
-    // Close the session
+    // Cierra la sesion
     folder.close(false);
     store.close();
-    
   } 
-  // This error handling isn't very good
+  // Gestion de errores muy basica
   catch (Exception e) {
     e.printStackTrace();
   }
 }
 
-// A function to send mail
+// Envia email a travez de smtp
 void sendMail() {
-  // Create a session
+
   Properties props=new Properties();
 
   // SMTP Session for gmail
@@ -113,7 +97,8 @@ void sendMail() {
   props.put("mail.smtp.host", smtp_host);
   props.put("mail.smtp.port", "587");
   props.put("mail.smtp.auth", "true");
-  // We need TTLS, which gmail requires
+  
+  // Necesitamos TLS para gmail
   props.put("mail.smtp.starttls.enable","true");
   /*
   //configuracion para ssl
@@ -124,12 +109,12 @@ void sendMail() {
   props.put("mail.smtp.socketFactory.fallback", "false");
   */
   // Crea una sesion
-  Session session = Session.getDefaultInstance(props, new Auth());
+  Session send_session = Session.getInstance(props, null);
 
   try
   {
     // Crea un nuevo mensaje
-    MimeMessage message = new MimeMessage(session);
+    MimeMessage message = new MimeMessage(send_session);
 
     // Define el remitente
     message.setFrom(new InternetAddress(email, "Cafetera"));
@@ -137,29 +122,24 @@ void sendMail() {
     // Define el destinatario
     message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("zea@randomlab.net", false));
 
-    // Subject and body
+    //Asunto y cuerpo del mensaje
     message.setSubject("Hello World!");
     message.setText("Ping from processing. . .");
-
-    // We can do more here, set the date, the headers, etc.
-    Transport.send(message);
     
-    /* otra forma de hacerlo por ssl
-    Transport transport = session.getTransport("smtps");
-    transport.connect(host, 587, email, pass );
+    
+    //Autenticacion y envio del mensaje
+    Transport transport = send_session.getTransport("smtp");
+    transport.connect(smtp_host, 587, email, pass );
     transport.sendMessage(message, message.getAllRecipients());
-    */
-    
-    //transport.close(); 
+    transport.close(); 
    
-       println("Mail sent!");
+    println("Mail sent!");
  
 }
   catch(Exception e)
   {
     e.printStackTrace();
   }
-
 }
 
 void keyReleased(){
