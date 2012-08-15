@@ -6,23 +6,38 @@
 
 import javax.mail.*;
 import javax.mail.internet.*;
+import processing.serial.*;
 
+
+
+Serial ser;
 Message lastMessage;
 int lastMessageCount;
 boolean firstCheck = true;
+String[] command;
 
 String email = "user@gmail.com";
 String smtp_host = "smtp.gmail.com";
 String imap_host = "imap.gmail.com";
 String pass = "password";
 
+long past;
+long interval = 10000;
 void setup() {
   size(200,200);
   lastMessageCount = 0;
+  
+  String portName = Serial.list()[0];
+  ser = new Serial(this, portName, 9600);
+  past = millis();
 }
 
 void draw(){
-
+  if(millis() - past > interval){
+    checkMail();
+    past = millis();
+    println("ckeking");
+  }
 }
 
 
@@ -31,7 +46,7 @@ void checkMail() {
     
     Properties props = new Properties();
 
-    //
+    
     props.put("mail.imap.port", "993");
     
     //seguridad
@@ -69,6 +84,8 @@ void checkMail() {
         println("--------- BEGIN MESSAGE------------");
         println("From: " + lastMessage.getFrom()[0]);
         println("Subject: " + lastMessage.getSubject());
+        command = parseCommand(lastMessage.getSubject());
+        executeCommand(command);
         println("Message:");
         String content = lastMessage.getContent().toString(); 
         println(content);
@@ -153,3 +170,29 @@ void keyReleased(){
   }
 }
 
+
+//aca parseamos la data que entra
+String[] parseCommand(String message){
+    String[] command = split(message, ' ');
+    return command ; 
+    
+}
+
+void executeCommand(String[] command){
+  String name = command[0];
+  String parameter = command[1];
+  println("name " + name);
+  println("param " + parameter);
+  
+  if(name == "led1"){
+    if(parameter == "on"){
+      ser.write('A');
+    }else if(parameter == "off"){
+      ser.write('B');
+    }else{
+      println("parameter unknown");
+    }
+  }else{
+    println("command unknown");
+  }
+}
