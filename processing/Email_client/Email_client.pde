@@ -16,7 +16,7 @@ int lastMessageCount;
 boolean firstCheck = true;
 String[] command;
 
-String email = "user@gmail.com";
+String email = "usuario@gmail.com";
 String smtp_host = "smtp.gmail.com";
 String imap_host = "imap.gmail.com";
 String pass = "password";
@@ -174,8 +174,7 @@ void keyReleased(){
 //aca parseamos la data que entra
 String[] parseCommand(String message){
     String[] command = split(message, ' ');
-    return command ; 
-    
+    return command ;   
 }
 
 void executeCommand(String[] command){
@@ -184,10 +183,10 @@ void executeCommand(String[] command){
   println("name " + name);
   println("param " + parameter);
   
-  if(name == "led1"){
-    if(parameter == "on"){
+  if(name.equals("led1")){
+    if(parameter.equals("on")){
       ser.write('A');
-    }else if(parameter == "off"){
+    }else if(parameter.equals("off")){
       ser.write('B');
     }else{
       println("parameter unknown");
