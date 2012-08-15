@@ -1,3 +1,7 @@
+/*
+*Cliente de email desarrollado para la clase de objetos en red
+*de la maestria en artes electronicas de la untref
+*/
 
 
 import javax.mail.*;
@@ -37,8 +41,6 @@ void checkMail() {
     props.setProperty("mail.imap.socketFactory.class","javax.net.ssl.SSLSocketFactory");
     */
     props.setProperty("mail.store.protocol", "imaps");
-
-    //Auth auth = new Auth();
     
     // Crea una sesion
     Session receive_session = Session.getDefaultInstance(props, null);
