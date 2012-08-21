@@ -115,7 +115,7 @@ void postData(){
   //Hace el PUT al URL del API
   ClientResponse response = couchdbResource.put(ClientResponse.class, dataJson.toJSONString());
   //finalmente imprime la respuesta enviada por el servidor
-  println("server response data \n================= ")
+  println("server response data \n================= ");
   println(response);
 }
 
