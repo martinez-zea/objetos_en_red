@@ -1,6 +1,7 @@
 
 
 TwC twitter;
+ArrayList searchResult;
 
 void setup() {
   
@@ -13,7 +14,17 @@ void setup() {
                      " " //AccessTokenSecret
                     );
   twitter.connect();
-  twitter.send("hello world! from #processing");
+ //twitter.send("hello world! from #processing");
+  
+  //busqueda 
+  searchResult = twitter.search("#testing");
+  for (int i=0; i<searchResult.size(); i++) {	
+        Tweet t = (Tweet)searchResult.get(i);	
+        String user = t.getFromUser();
+        String msg = t.getText();
+        Date d = t.getCreatedAt();	
+        println(msg);
+  }
 }
 
 

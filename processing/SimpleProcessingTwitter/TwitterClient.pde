@@ -75,31 +75,21 @@ class TwC{
       println(status.getUser().getName() + ": " + status.getText());
     }
   }
-  
-  
+    
   // Search for tweets
-  void getSearchTweets(String ask) {
+  ArrayList search(String ask) {
     String queryStr = ask;
+    ArrayList tweets = new ArrayList();
   
     try {
       Query query = new Query(queryStr);    
       query.setRpp(10); // Get 10 of the 100 search results  
       QueryResult result = twitter.search(query);    
-      ArrayList tweets = (ArrayList) result.getTweets();    
-  
-      for (int i=0; i<tweets.size(); i++) {	
-        Tweet t = (Tweet)tweets.get(i);	
-        String user = t.getFromUser();
-        String msg = t.getText();
-        Date d = t.getCreatedAt();	
-        theSearchTweets[i] = msg.substring(queryStr.length()+1);
-  
-        println(theSearchTweets[i]);
-      }
-  
+      tweets = (ArrayList) result.getTweets();    
     } catch (TwitterException e) {    
-      println("Search tweets: " + e);  
+      println("Search tweets: " + e); 
     }
+    return tweets;
   }
   
 }
