@@ -48,8 +48,12 @@ class TwC{
   // Sending a tweet
   void send(String t) {
     try {
-      Status status = twitter.updateStatus(t);
-      println("Successfully updated the status to [" + status.getText() + "].");
+      if(t.length() < 140){
+        Status status = twitter.updateStatus(t);
+        println("Successfully updated the status to [" + status.getText() + "].");
+      } else {
+        println("Error!!! message too long");
+      }
     } catch(TwitterException e) { 
       println("Send tweet: " + e + " Status code: " + e.getStatusCode());
     }
@@ -84,6 +88,22 @@ class TwC{
     try {
       Query query = new Query(queryStr);    
       query.setRpp(10); // Get 10 of the 100 search results  
+      QueryResult result = twitter.search(query);    
+      tweets = (ArrayList) result.getTweets();    
+    } catch (TwitterException e) {    
+      println("Search tweets: " + e); 
+    }
+    return tweets;
+  }
+  
+  ArrayList search(String ask, long since) {
+    String queryStr = ask;
+    ArrayList tweets = new ArrayList();
+  
+    try {
+      Query query = new Query(queryStr);    
+      query.setRpp(10); // Get 10 of the 100 search results
+      query.sinceId(since);  
       QueryResult result = twitter.search(query);    
       tweets = (ArrayList) result.getTweets();    
     } catch (TwitterException e) {    

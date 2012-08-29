@@ -17,13 +17,15 @@ void setup() {
  //twitter.send("hello world! from #processing");
   
   //busqueda 
+  //diferentes maneras:
   searchResult = twitter.search("#testing");
   for (int i=0; i<searchResult.size(); i++) {	
         Tweet t = (Tweet)searchResult.get(i);	
         String user = t.getFromUser();
         String msg = t.getText();
-        Date d = t.getCreatedAt();	
-        println(msg);
+        Date d = t.getCreatedAt();
+        long id = t.getId();	
+        println(id);
   }
 }
 
