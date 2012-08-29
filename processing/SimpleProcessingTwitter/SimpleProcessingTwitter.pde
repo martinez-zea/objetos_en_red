@@ -18,6 +18,7 @@ void setup() {
   
   //busqueda 
   //diferentes maneras:
+  //.search(String); -> todo
   searchResult = twitter.search("#testing");
   for (int i=0; i<searchResult.size(); i++) {	
         Tweet t = (Tweet)searchResult.get(i);	

@@ -96,6 +96,22 @@ class TwC{
     return tweets;
   }
   
+  // Search for tweets
+  ArrayList search(String ask, int results) {
+    String queryStr = ask;
+    ArrayList tweets = new ArrayList();
+  
+    try {
+      Query query = new Query(queryStr);    
+      query.setRpp(results); // Get 10 of the 100 search results  
+      QueryResult result = twitter.search(query);    
+      tweets = (ArrayList) result.getTweets();    
+    } catch (TwitterException e) {    
+      println("Search tweets: " + e); 
+    }
+    return tweets;
+  }
+  
   ArrayList search(String ask, long since) {
     String queryStr = ask;
     ArrayList tweets = new ArrayList();
